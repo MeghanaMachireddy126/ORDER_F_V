@@ -7,7 +7,7 @@ import AdminPage from "./pages/AdminPage";
 function App() {
   return (
     <Router>
-      <div className="p-4 bg-green-100 mb-6 flex gap-4">
+      <div className="p-4 bg-green-100 mb-6 flex justify-between items-start">
         <Link to="/" className="text-green-700 font-bold">Catalogue</Link>
         <Link to="/order" className="text-green-700 font-bold">Order</Link>
         <Link to="/track" className="text-green-700 font-bold">Track</Link>

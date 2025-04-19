@@ -9,12 +9,17 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
-// PostgreSQL Connection
+// PostgreSQL pool setup
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
+  connectionString: 'postgresql://FVorder_owner:npg_l5jBai9CGFVL@ep-jolly-shadow-a4glnxdr-pooler.us-east-1.aws.neon.tech/FVorder?sslmode=require',
 });
 
-// 📦 Get All Products
+// Root route
+app.get("/", (req, res) => {
+  res.send("Backend is working!");
+});
+
+// Get all products
 app.get('/api/products', async (req, res) => {
   try {
     const result = await pool.query('SELECT * FROM products');
@@ -24,7 +29,7 @@ app.get('/api/products', async (req, res) => {
   }
 });
 
-// ➕ Add Product (Admin)
+// Add a new product (Admin)
 app.post('/api/products', async (req, res) => {
   const { name, price } = req.body;
   try {
@@ -38,7 +43,7 @@ app.post('/api/products', async (req, res) => {
   }
 });
 
-// ✏️ Update Product (Admin)
+// Update product (Admin)
 app.put('/api/products/:id', async (req, res) => {
   const { id } = req.params;
   const { name, price } = req.body;
@@ -53,7 +58,7 @@ app.put('/api/products/:id', async (req, res) => {
   }
 });
 
-// ❌ Delete Product (Admin)
+//Delete product (Admin)
 app.delete('/api/products/:id', async (req, res) => {
   const { id } = req.params;
   try {
@@ -64,10 +69,12 @@ app.delete('/api/products/:id', async (req, res) => {
   }
 });
 
-// 📝 Place Order
+// Place Order with validation
 app.post('/api/orders', async (req, res) => {
   const { name, address, contact, items } = req.body;
   try {
+    console.log("📦 Incoming Order:", { name, address, contact, items });
+
     const orderResult = await pool.query(
       'INSERT INTO orders (name, address, contact, status) VALUES ($1, $2, $3, $4) RETURNING id',
       [name, address, contact, 'Pending']
@@ -75,6 +82,20 @@ app.post('/api/orders', async (req, res) => {
     const orderId = orderResult.rows[0].id;
 
     for (const item of items) {
+      console.log("🔍 Checking Product ID:", item.product_id);
+
+      const productCheck = await pool.query(
+        'SELECT id FROM products WHERE id = $1',
+        [item.product_id]
+      );
+
+      if (productCheck.rowCount === 0) {
+        console.error(`❌ Product not found for ID: ${item.product_id}`);
+        return res.status(400).json({
+          error: `Product with id ${item.product_id} does not exist`,
+        });
+      }
+
       await pool.query(
         'INSERT INTO order_items (order_id, product_id, quantity) VALUES ($1, $2, $3)',
         [orderId, item.product_id, item.quantity]
@@ -83,31 +104,35 @@ app.post('/api/orders', async (req, res) => {
 
     res.status(201).json({ id: orderId, status: 'Pending' });
   } catch (err) {
+    console.error("❌ Order submission failed:", err.message);
     res.status(500).json({ error: err.message });
   }
 });
 
-// 🔍 Track Order by ID
+// Track Order by ID
 app.get('/api/orders/:id', async (req, res) => {
-  const { id } = req.params;
-  try {
-    const order = await pool.query('SELECT * FROM orders WHERE id = $1', [id]);
-    const items = await pool.query(
-      'SELECT p.name, p.price, oi.quantity FROM order_items oi JOIN products p ON oi.product_id = p.id WHERE order_id = $1',
-      [id]
-    );
+  const rawId = req.params.id;
+  const orderId = parseInt(rawId, 10);
 
-    if (order.rows.length === 0) {
-      return res.status(404).json({ message: 'Order not found' });
+  console.log("Incoming request for Order ID:", orderId);
+
+  try {
+    const orderResult = await pool.query('SELECT * FROM orders WHERE id = $1', [orderId]);
+    console.log("Query Result:", orderResult.rows);
+
+    if (orderResult.rows.length === 0) {
+      console.log("⚠️ No order found in DB");
+      return res.status(404).json({ error: 'Order not found' });
     }
 
-    res.json({ ...order.rows[0], items: items.rows });
+    res.json(orderResult.rows[0]);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error("❌ Error querying the database:", err);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
-// 📊 Admin: Get All Orders
+//Admin: Get All Orders
 app.get('/api/orders', async (req, res) => {
   try {
     const result = await pool.query('SELECT * FROM orders ORDER BY id DESC');
@@ -117,7 +142,7 @@ app.get('/api/orders', async (req, res) => {
   }
 });
 
-// 🔁 Admin: Update Order Status
+//Admin: Update Order Status
 app.put('/api/orders/:id/status', async (req, res) => {
   const { id } = req.params;
   const { status } = req.body;
@@ -132,6 +157,7 @@ app.put('/api/orders/:id/status', async (req, res) => {
   }
 });
 
+// Start server
 app.listen(PORT, () => {
   console.log(`🚀 Server running at http://localhost:${PORT}`);
 });

@@ -3,19 +3,35 @@ import React, { useState } from "react";
 const TrackPage = () => {
   const [orderId, setOrderId] = useState("");
   const [orderDetails, setOrderDetails] = useState(null);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleTrack = async (e) => {
     e.preventDefault();
-    const response = await fetch(`http://localhost:5000/orders/${orderId}`);
-    const data = await response.json();
-    setOrderDetails(data);
+    setErrorMessage("");
+    setOrderDetails(null);
+
+    try {
+      const cleanedId = orderId.replace(":", "").trim();
+      const response = await fetch(`http://localhost:5000/api/orders/${cleanedId}`);
+      const data = await response.json();
+      console.log("API Response:", data);
+
+      if (response.ok && data && data.id) {
+        setOrderDetails(data); // ✅ Directly the order object
+      } else {
+        setErrorMessage("Order not found");
+      }
+    } catch (error) {
+      console.error("Error tracking order:", error);
+      setErrorMessage("Something went wrong");
+    }
   };
 
   const containerStyle = {
     backgroundColor: "#fff8f0",
     padding: "30px",
     minHeight: "100vh",
-    fontFamily: "sans-serif"
+    fontFamily: "sans-serif",
   };
 
   const formStyle = {
@@ -24,7 +40,7 @@ const TrackPage = () => {
     backgroundColor: "#fff",
     padding: "20px",
     borderRadius: "10px",
-    boxShadow: "0 2px 10px rgba(0,0,0,0.1)"
+    boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
   };
 
   const inputStyle = {
@@ -32,7 +48,7 @@ const TrackPage = () => {
     padding: "10px",
     marginBottom: "15px",
     borderRadius: "5px",
-    border: "1px solid #ccc"
+    border: "1px solid #ccc",
   };
 
   const buttonStyle = {
@@ -41,14 +57,14 @@ const TrackPage = () => {
     color: "#fff",
     border: "none",
     borderRadius: "5px",
-    cursor: "pointer"
+    cursor: "pointer",
   };
 
   const resultStyle = {
     marginTop: "20px",
     backgroundColor: "#eafaf1",
     padding: "10px",
-    borderRadius: "5px"
+    borderRadius: "5px",
   };
 
   return (
@@ -60,16 +76,25 @@ const TrackPage = () => {
           type="text"
           placeholder="Order ID"
           value={orderId}
-          onChange={(e) => setOrderId(e.target.value)}
+          onChange={(e) => setOrderId(e.target.value.replace(":", "").trim())}
         />
-        <button style={buttonStyle} type="submit">Track</button>
+        <button style={buttonStyle} type="submit">
+          Track
+        </button>
       </form>
+
+      {errorMessage && (
+        <div style={resultStyle}>
+          <p style={{ color: "red" }}>{errorMessage}</p>
+        </div>
+      )}
 
       {orderDetails && (
         <div style={resultStyle}>
           <p><strong>Name:</strong> {orderDetails.name}</p>
-          <p><strong>Product:</strong> {orderDetails.product}</p>
-          <p><strong>Quantity:</strong> {orderDetails.quantity}</p>
+          <p><strong>Address:</strong> {orderDetails.address}</p>
+          <p><strong>Contact:</strong> {orderDetails.contact}</p>
+          <p><strong>Status:</strong> {orderDetails.status}</p>
         </div>
       )}
     </div>
