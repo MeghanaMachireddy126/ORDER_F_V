@@ -1,70 +1,125 @@
-# Getting Started with Create React App
+# Bulk Vegetable/Fruit Ordering Platform
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Overview
 
-## Available Scripts
+This project is a **Bulk Vegetable/Fruit Ordering Platform** where **buyers** can browse available products, place bulk orders, and track their order status. **Admins** can manage orders and inventory. The platform uses a full-stack approach with React.js for the frontend and Express.js for the backend, along with PostgreSQL for the database.
 
-In the project directory, you can run:
+## Features
 
-### `npm start`
+### For Buyers:
+1. **Browse Vegetables/Fruits:**
+   - Display a catalog of vegetables and fruits with basic details like name and price per unit.
+   - No stock tracking is required (assume all items are available).
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+2. **Place Orders:**
+   - Buyers can place bulk orders by specifying the vegetable/fruit, the desired quantity, and delivery details (name, contact information, and address).
+   - Orders should be saved with a unique identifier.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+3. **Order Tracking:**
+   - Buyers can track the status of their orders:
+     - **Pending**: Order has been received.
+     - **In Progress**: Order is being processed for delivery.
+     - **Delivered**: Order has been delivered.
 
-### `npm test`
+### For Admins:
+1. **Order Management:**
+   - Admins can view all placed orders with details about the buyer, delivery address, and ordered items.
+   - Admins can update the status of the order (Pending → In Progress → Delivered).
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+2. **Inventory Management:**
+   - Admins can add, edit, or remove vegetables/fruits from the catalog.
+   - No stock tracking is required (assume all products are always available).
 
-### `npm run build`
+## Tech Stack
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+- **Frontend:** React.js (or Next.js)
+- **Backend:** Express.js (or Flask) for API routes
+- **Database:** PostgreSQL (hosted on Neon.tech or Dockerized Postgres)
+- **UI Styling:** TailwindCSS (for clean and responsive design)
+- **Authentication:** Optional (can be added later for admin login)
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## Database Schema
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+1. **Products Table (for inventory):**
+   - `id` (Primary Key)
+   - `name` (String)
+   - `price_per_unit` (Decimal)
 
-### `npm run eject`
+2. **Orders Table (for buyers):**
+   - `id` (Primary Key)
+   - `name` (String)
+   - `contact` (String)
+   - `delivery_address` (String)
+   - `status` (Enum: Pending, In Progress, Delivered)
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+3. **Order Items Table (linking orders with products):**
+   - `id` (Primary Key)
+   - `order_id` (Foreign Key)
+   - `product_id` (Foreign Key)
+   - `quantity` (Integer)
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## API Routes Overview
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+| Method | Endpoint                          | Description                                             |
+|--------|-----------------------------------|---------------------------------------------------------|
+| GET    | `/api/products`                   | Get all available products                             |
+| POST   | `/api/orders`                     | Place a new order (Buyer)                              |
+| GET    | `/api/orders/:id`                 | Track an order by ID (Buyer)                           |
+| GET    | `/api/orders`                     | Get all orders (Admin)                                 |
+| PUT    | `/api/orders/:id/status`          | Update order status (Admin)                            |
+| POST   | `/api/products`                   | Add a new product (Admin)                              |
+| PUT    | `/api/products/:id`               | Edit an existing product (Admin)                       |
+| DELETE | `/api/products/:id`               | Delete a product (Admin)                               |
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+## Frontend Pages
 
-## Learn More
+1. **Product Catalog Page:**
+   - Display a list of vegetables/fruits with their names and prices.
+   - Implement pagination or filtering if necessary.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+2. **Order Placement Form:**
+   - A form that lets the buyer select a vegetable/fruit, specify the quantity, and provide their delivery information.
+   - On form submission, send a POST request to save the order.
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+3. **Order Tracking Page:**
+   - Allow buyers to check the status of their orders by entering an order ID.
+   - Display the current status of the order.
 
-### Code Splitting
+4. **Admin Dashboard:**
+   - A page where admins can see all orders.
+   - Ability to update order status (from Pending to In Progress to Delivered).
+   - Admin can also manage the product catalog (add, edit, remove items).
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+## Backend (API Routes)
 
-### Analyzing the Bundle Size
+1. **Product Catalog API:**
+   - **GET** `/api/products`: Fetch the list of all available products.
+  
+2. **Order Placement API:**
+   - **POST** `/api/orders`: Place a new order with the specified items and buyer information.
+  
+3. **Order Tracking API:**
+   - **GET** `/api/orders/:id`: Track the status of an order by its unique ID.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+4. **Admin Order Management API:**
+   - **GET** `/api/orders`: Fetch all orders with buyer and delivery details.
+   - **PUT** `/api/orders/:id/status`: Update the status of an order (Pending → In Progress → Delivered).
 
-### Making a Progressive Web App
+5. **Admin Inventory Management API:**
+   - **POST** `/api/products`: Add a new product.
+   - **PUT** `/api/products/:id`: Edit an existing product.
+   - **DELETE** `/api/products/:id`: Delete a product.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+## Installation
 
-### Advanced Configuration
+### Prerequisites
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+- Node.js and npm (or yarn) installed
+- PostgreSQL database running (use Neon.tech or Docker for hosting)
+- Git for version control
 
-### Deployment
+### Backend Setup
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/yourusername/bulk-ordering-platform.git
