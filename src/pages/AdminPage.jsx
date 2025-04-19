@@ -12,7 +12,7 @@ const AdminPage = () => {
   };
 
   const fetchProducts = () => {
-    fetch("ttps://backendfvorders.onrender.com/api/products")
+    fetch("https://backendfvorders.onrender.com/api/products")
       .then((res) => res.json())
       .then((data) => setProducts(data));
   };
@@ -23,7 +23,7 @@ const AdminPage = () => {
   }, []);
 
   const updateOrderStatus = (id, status) => {
-    fetch(`ttps://backendfvorders.onrender.com/api/orders/${id}/status`, {
+    fetch(`https://backendfvorders.onrender.com/api/orders/${id}/status`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ status }),
@@ -34,7 +34,7 @@ const AdminPage = () => {
 
   const addProduct = () => {
     const { name, price } = newProduct;
-    fetch("ttps://backendfvorders.onrender.com/api/products", {
+    fetch("https://backendfvorders.onrender.com/api/products", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name, price }),
@@ -47,7 +47,7 @@ const AdminPage = () => {
   };
 
   const updateProduct = (id, name, price) => {
-    fetch(`ttps://backendfvorders.onrender.com/api/products/${id}`, {
+    fetch(`https://backendfvorders.onrender.com/api/products/${id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name, price }),
@@ -55,7 +55,7 @@ const AdminPage = () => {
   };
 
   const deleteProduct = (id) => {
-    fetch(`ttps://backendfvorders.onrender.com/api/products/${id}`, {
+    fetch(`https://backendfvorders.onrender.com/api/products/${id}`, {
       method: "DELETE",
     }).then(() => fetchProducts());
   };
