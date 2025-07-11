@@ -7,11 +7,11 @@ import AdminPage from "./pages/AdminPage";
 function App() {
   return (
     <Router>
-      <div className="p-4 bg-green-100 mb-6 flex justify-between items-start">
-        <Link to="/" className="text-green-700 font-bold">Catalogue</Link>
-        <Link to="/order" className="text-green-700 font-bold">Order</Link>
-        <Link to="/track" className="text-green-700 font-bold">Track</Link>
-        <Link to="/admin" className="text-green-700 font-bold">Admin</Link>
+      <div style={headerStyle}>
+        <Link to="/" style={buttonStyle}>Catalogue</Link>
+        <Link to="/order" style={buttonStyle}>Order</Link>
+        <Link to="/track" style={buttonStyle}>Track</Link>
+        <Link to="/admin" style={buttonStyle}>Admin</Link>
       </div>
 
       <Routes>
@@ -23,5 +23,44 @@ function App() {
     </Router>
   );
 }
+
+const headerStyle = {
+  backgroundColor: "#e0f7fa",
+  padding: "16px",
+  display: "flex",
+  justifyContent: "center",
+  gap: "20px",
+  flexWrap: "wrap",
+  boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+  marginBottom: "30px",
+};
+
+const buttonStyle = {
+  backgroundColor: "#ffffff",
+  color: "#00796b",
+  textDecoration: "none",
+  padding: "10px 20px",
+  fontWeight: "600",
+  borderRadius: "8px",
+  border: "2px solid #00796b",
+  transition: "all 0.3s ease",
+};
+
+const buttonHoverStyle = {
+  backgroundColor: "#00796b",
+  color: "#ffffff",
+};
+
+document.addEventListener("DOMContentLoaded", () => {
+  const links = document.querySelectorAll("a");
+  links.forEach((link) => {
+    link.addEventListener("mouseenter", () => {
+      Object.assign(link.style, buttonHoverStyle);
+    });
+    link.addEventListener("mouseleave", () => {
+      Object.assign(link.style, buttonStyle);
+    });
+  });
+});
 
 export default App;
