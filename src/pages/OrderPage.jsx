@@ -18,21 +18,26 @@ const OrderPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const response = await fetch("https://backendfvorders.onrender.com/api/orders", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, address, contact, items }),
-    });
 
-    const data = await response.json();
-    if (response.ok) {
-      alert(`✅ Order placed successfully! Your order ID is ${data.id}`);
-      setName("");
-      setAddress("");
-      setContact("");
-      setItems([{ product_id: "", quantity: "" }]);
-    } else {
-      alert("❌ Something went wrong: " + data.error);
+    try {
+      const response = await fetch("https://backendfvorders.onrender.com/api/orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, address, contact, items }),
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        alert(`✅ Order placed successfully! Your order ID is ${data.id}`);
+        setName("");
+        setAddress("");
+        setContact("");
+        setItems([{ product_id: "", quantity: "" }]);
+      } else {
+        alert("❌ Something went wrong: " + data.error);
+      }
+    } catch (error) {
+      alert("❌ Network error: " + error.message);
     }
   };
 
@@ -104,8 +109,8 @@ const OrderPage = () => {
           <div key={index}>
             <input
               style={inputStyle}
-              type="text"
-              placeholder="Product Name -> Product id(1-19)"
+              type="number"
+              placeholder="Product ID (1-15)"
               value={item.product_id}
               onChange={(e) =>
                 handleItemChange(index, "product_id", e.target.value)
