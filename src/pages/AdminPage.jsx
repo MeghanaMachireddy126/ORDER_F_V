@@ -34,7 +34,8 @@ const AdminPage = () => {
 
   const addProduct = () => {
     const { name, price } = newProduct;
-    fetch("https://backendfvorders.onrender.com/api/products", {
+    fetch("https://backendfvorders.onrender.com/api/products
+", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name, price }),
