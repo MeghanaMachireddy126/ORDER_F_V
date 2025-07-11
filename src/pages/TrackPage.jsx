@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 
 const TrackPage = () => {
-  const [orderId, setOrderId] = useState("");
+  const [orderId, setOrderId]       = useState("");
   const [orderDetails, setOrderDetails] = useState(null);
   const [errorMessage, setErrorMessage] = useState("");
 
+  /* ---------- track handler ---------- */
   const handleTrack = async (e) => {
     e.preventDefault();
     setErrorMessage("");
@@ -12,21 +13,23 @@ const TrackPage = () => {
 
     try {
       const cleanedId = orderId.replace(":", "").trim();
-      const response = await fetch(`https://backendfvorders.onrender.com/api/orders/${cleanedId}`);
+      const response  = await fetch(
+        `https://backendfvorders.onrender.com/api/orders/${cleanedId}`
+      );
       const data = await response.json();
-      console.log("API Response:", data);
 
       if (response.ok && data && data.id) {
-        setOrderDetails(data); // ✅ Directly the order object
+        setOrderDetails(data);
       } else {
         setErrorMessage("Order not found");
       }
-    } catch (error) {
-      console.error("Error tracking order:", error);
+    } catch (err) {
+      console.error("Error tracking order:", err);
       setErrorMessage("Something went wrong");
     }
   };
 
+  /* ---------- inline styles ---------- */
   const containerStyle = {
     backgroundColor: "#fff8f0",
     padding: "30px",
@@ -67,9 +70,11 @@ const TrackPage = () => {
     borderRadius: "5px",
   };
 
+  /* ---------- render ---------- */
   return (
     <div style={containerStyle}>
-      <h2 style={{ textAlign: "center", color: "#333" }}>Track Your Order</h2>
+      <h2 style={{ textAlign: "center", color: "#333" }}>📦 Track Your Order</h2>
+
       <form style={formStyle} onSubmit={handleTrack}>
         <input
           style={inputStyle}
@@ -77,9 +82,10 @@ const TrackPage = () => {
           placeholder="Order ID"
           value={orderId}
           onChange={(e) => setOrderId(e.target.value.replace(":", "").trim())}
+          required
         />
         <button style={buttonStyle} type="submit">
-          Track
+          🔍 Track
         </button>
       </form>
 
