@@ -20,7 +20,7 @@ const OrderPage = () => {
     e.preventDefault();
 
     try {
-      const response = await fetch("https://backendfvorders.onrender.com/api/orders", {
+      const response = await fetch("https://backendfvorders-8asa.onrender.com/api/orders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, address, contact, items }),
