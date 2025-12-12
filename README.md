@@ -3,7 +3,7 @@
 ## Overview
 
 This project is a **Bulk Vegetable/Fruit Ordering Platform** where **buyers** can browse available products, place bulk orders, and track their order status. **Admins** can manage orders and inventory. The platform uses a full-stack approach with React.js for the frontend and Express.js for the backend, along with PostgreSQL for the database.
-
+Live-demo: https://order-fv.vercel.app/
 ## Features
 
 ### For Buyers:
